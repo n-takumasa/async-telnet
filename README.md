@@ -1,2 +1,2 @@
-# async-telnet
-asyncioでtelnet
+# async-netcat
+asyncioでnetcat

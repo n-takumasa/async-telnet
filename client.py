@@ -1,4 +1,3 @@
-# ruff: noqa: INP001, T201, COM812
 import argparse
 import asyncio
 import codecs
@@ -9,18 +8,19 @@ async def ainput():
     return await asyncio.get_event_loop().run_in_executor(None, sys.stdin.readline)
 
 
+async def listener(reader: asyncio.StreamReader, encoding: str):
+    decoder = codecs.getincrementaldecoder(encoding)()
+    while True:
+        if (data := await reader.read(1)) == b"":
+            break
+        mes = decoder.decode(data)
+        print(mes, end="", flush=True)
+
+
 async def amain(host: str, port: int, encoding: str):
     reader, writer = await asyncio.open_connection(host, port)
     print("Use Ctrl-Z plus Return to exit")
     print(f"Connect: {(host, port)}")
-
-    async def listener(reader, encoding):
-        decoder = codecs.getincrementaldecoder(encoding)()
-        while True:
-            if (data := await reader.read(1)) == b"":
-                break
-            mes = decoder.decode(data)
-            print(mes, end="", flush=True)
 
     task = asyncio.create_task(listener(reader, encoding))
 
